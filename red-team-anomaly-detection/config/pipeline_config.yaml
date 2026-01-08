@@ -1,0 +1,169 @@
+# Red Team Anomaly Detection Pipeline Configuration
+
+# Data Configuration
+data:
+  input_path: "data/raw/sample_logs.json"
+  processed_path: "data/processed/clean_logs.parquet"
+  test_split: 0.2
+  random_seed: 42
+  
+  # Log parsing settings
+  log_format: "json"
+  timestamp_field: "timestamp"
+  required_fields:
+    - "session_id"
+    - "user_id"
+    - "source_ip"
+    - "action"
+    - "resource"
+
+# Feature Engineering Configuration
+features:
+  output_path: "data/processed/features.parquet"
+  
+  # Behavioral features
+  behavioral:
+    enabled: true
+    window_size: "1h"
+    features:
+      - "failed_login_count"
+      - "privilege_escalation_attempts"
+      - "unique_resources_accessed"
+      - "session_duration"
+      - "action_frequency"
+  
+  # Network features
+  network:
+    enabled: true
+    features:
+      - "bytes_transferred"
+      - "connection_count"
+      - "unique_destinations"
+      - "port_scan_indicators"
+      - "lateral_movement_score"
+  
+  # Temporal features
+  temporal:
+    enabled: true
+    features:
+      - "hour_of_day"
+      - "day_of_week"
+      - "is_business_hours"
+      - "time_since_last_action"
+      - "action_velocity"
+  
+  # Statistical aggregations
+  aggregations:
+    - "mean"
+    - "std"
+    - "min"
+    - "max"
+    - "median"
+
+# Model Configuration
+models:
+  model_dir: "models/saved_models"
+  
+  # Models to train
+  enabled_models:
+    - "isolation_forest"
+    - "autoencoder"
+    - "one_class_svm"
+    - "lstm"
+  
+  # Isolation Forest
+  isolation_forest:
+    n_estimators: 100
+    max_samples: "auto"
+    contamination: 0.1
+    random_state: 42
+  
+  # Autoencoder
+  autoencoder:
+    encoding_dim: 32
+    hidden_layers: [64, 32, 16]
+    activation: "relu"
+    epochs: 50
+    batch_size: 32
+    learning_rate: 0.001
+    reconstruction_threshold: 0.95
+  
+  # One-Class SVM
+  one_class_svm:
+    kernel: "rbf"
+    gamma: "auto"
+    nu: 0.1
+  
+  # LSTM
+  lstm:
+    sequence_length: 10
+    lstm_units: [64, 32]
+    dropout: 0.2
+    epochs: 30
+    batch_size: 32
+    learning_rate: 0.001
+
+# Detection Pipeline Configuration
+detection:
+  # Scoring thresholds
+  thresholds:
+    isolation_forest: -0.5
+    autoencoder: 0.95
+    one_class_svm: 0.0
+    lstm: 0.8
+  
+  # Ensemble settings
+  ensemble:
+    enabled: true
+    method: "voting"  # voting, weighted, stacking
+    weights:
+      isolation_forest: 0.25
+      autoencoder: 0.30
+      one_class_svm: 0.20
+      lstm: 0.25
+  
+  # Alert settings
+  alerts:
+    enabled: true
+    severity_levels:
+      high: 0.9
+      medium: 0.7
+      low: 0.5
+    
+    # Alert destinations
+    destinations:
+      - "log"
+      - "email"
+      - "webhook"
+
+# Evaluation Configuration
+evaluation:
+  metrics:
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "auc_roc"
+    - "confusion_matrix"
+  
+  cross_validation:
+    enabled: true
+    folds: 5
+  
+  # Feature importance analysis
+  feature_importance:
+    enabled: true
+    top_n: 20
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "{time} | {level} | {message}"
+  rotation: "500 MB"
+  retention: "30 days"
+
+# Performance Configuration
+performance:
+  n_jobs: -1  # Use all CPU cores
+  cache_features: true
+  batch_processing: true
+  batch_size: 1000
