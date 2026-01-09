@@ -209,13 +209,33 @@ This framework:
 
 ```
 offensive-tooling-signal-generator/
-├── config/                    # Configuration files
-│   ├── tools_config.yaml     # Tool wrapper settings
-│   ├── telemetry_config.yaml # Monitoring params
-│   └── siem_config.yaml      # SIEM endpoints
+├── config/
+│   ├── tools_config.yaml
+│   ├── telemetry_config.yaml
+│   └── siem_config.yaml
 ├── data/
-│   ├── training/             # Training datasets (Parquet)
-│   ├──
+│   ├── raw/                        # Immutable raw outputs
+│   │   ├── tool_runs/              # JSONL per run (tool I/O)
+│   │   └── telemetry/              # Structured logs, traces, metrics
+│   ├── bronze/                     # Lightly cleaned, schema-aligned
+│   │   ├── events/                 # Per-tool, per-scenario events
+│   │   └── artifacts/              # Files (pcaps, reports, screenshots)
+│   ├── silver/                     # Feature-ready ML datasets
+│   │   ├── training/               # Parquet feature tables + labels
+│   │   └── inference/              # Live features for scoring
+│   └── gold/                       # Aggregated views for analytics/SIEM
+│       ├── siem_exports/           # ECS/CEF/LEEF-normalized exports
+│       └── dashboards/             # Aggregated stats for observability
+├── models/
+│   ├── signal_detection/           # Model binaries + metadata
+│   └── drift_monitoring/           # Stats, thresholds
+├── logs/
+│   ├── app/                        # Application logs
+│   └── audit/                      # Security/audit trail
+└── storage/
+    ├── retention_policies.md       # Data retention & rotation
+    ├── schemas/                    # JSON/Avro schemas for all layers
+    └── catalog.yaml                # Logical catalog of tables & paths
 
 ```
 
