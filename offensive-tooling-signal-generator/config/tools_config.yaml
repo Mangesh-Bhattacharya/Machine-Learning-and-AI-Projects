@@ -1,0 +1,306 @@
+# Offensive Tooling Signal Generator Configuration
+
+# Tools Configuration
+tools:
+  nmap:
+    binary_path: "/usr/bin/nmap"
+    default_args:
+      - "-sS"  # SYN scan
+      - "-T4"  # Timing template
+    telemetry_enabled: true
+    timeout: 300
+    max_retries: 3
+    
+  nuclei:
+    binary_path: "/usr/local/bin/nuclei"
+    templates_dir: "/opt/nuclei-templates"
+    default_args:
+      - "-silent"
+      - "-json"
+    telemetry_enabled: true
+    timeout: 600
+    
+  metasploit:
+    msf_path: "/opt/metasploit-framework"
+    rpc_enabled: true
+    rpc_host: "127.0.0.1"
+    rpc_port: 55553
+    rpc_ssl: true
+    telemetry_enabled: true
+    
+  sqlmap:
+    binary_path: "/usr/bin/sqlmap"
+    default_args:
+      - "--batch"
+      - "--random-agent"
+    telemetry_enabled: true
+    timeout: 900
+    
+  hydra:
+    binary_path: "/usr/bin/hydra"
+    default_args:
+      - "-V"  # Verbose
+    telemetry_enabled: true
+    max_threads: 16
+    
+  gobuster:
+    binary_path: "/usr/bin/gobuster"
+    wordlist: "/usr/share/wordlists/dirb/common.txt"
+    telemetry_enabled: true
+    threads: 50
+
+# Telemetry Configuration
+telemetry:
+  # Network monitoring
+  network:
+    capture_interface: "eth0"
+    capture_filter: "tcp or udp or icmp"
+    packet_limit: 100000
+    promiscuous_mode: true
+    buffer_size: 10485760  # 10MB
+    
+  # Process monitoring
+  process:
+    monitor_children: true
+    capture_syscalls: true
+    syscall_filter:
+      - "socket"
+      - "connect"
+      - "sendto"
+      - "recvfrom"
+      - "open"
+      - "execve"
+    track_memory: true
+    track_cpu: true
+    sampling_interval: 0.1  # seconds
+    
+  # File system monitoring
+  filesystem:
+    monitor_paths:
+      - "/tmp"
+      - "/var/tmp"
+      - "/home"
+    track_modifications: true
+    track_access: true
+    
+  # Network traffic analysis
+  traffic:
+    deep_packet_inspection: true
+    extract_payloads: true
+    max_payload_size: 1024
+    track_connections: true
+    connection_timeout: 300
+
+# Feature Engineering Configuration
+features:
+  # Network features
+  network:
+    window_size: 60  # seconds
+    aggregation_interval: 5
+    features:
+      - "packet_rate"
+      - "packet_size_stats"
+      - "protocol_distribution"
+      - "port_scan_entropy"
+      - "syn_ratio"
+      - "failed_connection_ratio"
+      - "retransmission_rate"
+      - "inter_packet_delay"
+      - "burst_rate"
+      - "unique_destinations"
+      
+  # Behavioral features
+  behavioral:
+    features:
+      - "sequential_port_access"
+      - "common_ports_ratio"
+      - "scan_pattern"
+      - "timing_pattern"
+      - "user_agent_entropy"
+      - "ttl_pattern"
+      - "window_size_pattern"
+      
+  # Process features
+  process:
+    features:
+      - "cpu_usage_spike"
+      - "memory_usage_spike"
+      - "thread_count"
+      - "syscall_frequency"
+      - "network_syscall_ratio"
+      - "child_process_count"
+      - "privilege_escalation"
+      
+  # Temporal features
+  temporal:
+    features:
+      - "scan_duration"
+      - "time_of_day"
+      - "day_of_week"
+      - "activity_burst"
+      - "idle_periods"
+      
+  # Fingerprint generation
+  fingerprint:
+    vector_size: 128
+    normalization: "minmax"
+    include_tool_signature: true
+
+# Machine Learning Configuration
+ml:
+  # Dataset building
+  dataset:
+    train_split: 0.7
+    val_split: 0.15
+    test_split: 0.15
+    random_seed: 42
+    balance_classes: true
+    
+  # Model training
+  models:
+    random_forest:
+      n_estimators: 200
+      max_depth: 20
+      min_samples_split: 5
+      n_jobs: -1
+      
+    xgboost:
+      n_estimators: 200
+      max_depth: 10
+      learning_rate: 0.1
+      subsample: 0.8
+      
+    neural_network:
+      hidden_layers: [256, 128, 64]
+      activation: "relu"
+      dropout: 0.3
+      epochs: 50
+      batch_size: 64
+      
+    isolation_forest:
+      n_estimators: 100
+      contamination: 0.1
+      
+  # Detection thresholds
+  detection:
+    confidence_threshold: 0.7
+    anomaly_threshold: -0.5
+    
+  # Model evaluation
+  evaluation:
+    metrics:
+      - "accuracy"
+      - "precision"
+      - "recall"
+      - "f1_score"
+      - "roc_auc"
+    cross_validation: 5
+
+# SIEM Integration Configuration
+siem:
+  enabled: false
+  type: "splunk"  # splunk, elastic, sentinel
+  
+  # Splunk configuration
+  splunk:
+    host: "splunk.company.com"
+    port: 8088
+    token: "${SPLUNK_HEC_TOKEN}"
+    index: "security"
+    sourcetype: "offensive_tool_detection"
+    ssl_verify: true
+    
+  # Elastic configuration
+  elastic:
+    hosts:
+      - "https://elastic:9200"
+    api_key: "${ELASTIC_API_KEY}"
+    index: "offensive-tools"
+    
+  # Microsoft Sentinel configuration
+  sentinel:
+    workspace_id: "${SENTINEL_WORKSPACE_ID}"
+    shared_key: "${SENTINEL_SHARED_KEY}"
+    log_type: "OffensiveToolDetection"
+
+# Alert Configuration
+alerts:
+  enabled: true
+  severity_levels:
+    critical: 0.9
+    high: 0.7
+    medium: 0.5
+    low: 0.3
+    
+  notification:
+    email:
+      enabled: false
+      smtp_server: "smtp.company.com"
+      recipients:
+        - "security@company.com"
+    
+    slack:
+      enabled: false
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+    
+    pagerduty:
+      enabled: false
+      integration_key: "${PAGERDUTY_KEY}"
+
+# Output Configuration
+output:
+  telemetry_dir: "data/telemetry"
+  dataset_dir: "data/training"
+  model_dir: "models/saved_models"
+  logs_dir: "logs"
+  
+  # Data retention
+  retention:
+    telemetry_days: 30
+    logs_days: 90
+
+# Performance Configuration
+performance:
+  max_concurrent_tools: 5
+  max_memory_mb: 4096
+  max_cpu_percent: 80
+  
+  # Caching
+  cache:
+    enabled: true
+    backend: "redis"
+    redis_host: "localhost"
+    redis_port: 6379
+    ttl: 3600
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "{time} | {level} | {message}"
+  rotation: "500 MB"
+  retention: "30 days"
+  
+  # Component-specific logging
+  components:
+    wrappers: "DEBUG"
+    telemetry: "INFO"
+    features: "INFO"
+    ml: "INFO"
+
+# Security Configuration
+security:
+  # Sandboxing
+  sandbox:
+    enabled: true
+    use_docker: true
+    network_isolation: true
+    
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    max_scans_per_hour: 100
+    
+  # Authorization
+  auth:
+    enabled: false
+    api_key_required: false
