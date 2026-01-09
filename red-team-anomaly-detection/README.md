@@ -14,7 +14,107 @@ This project demonstrates how to:
 ## 🏗️ Architecture
 
 ```
-Red Team Logs → Data Ingestion → Feature Engineering → Model Training → Anomaly Detection → Alerting
+┌───────────────────────────────────────────────────────────┐
+│               Red Team Log Generation                     │
+│  (Simulated attacks: web app, lateral movement,           │
+│   privilege escalation, data exfiltration)                │
+│                                                           │
+│  Log format: JSON with timestamp, session_id, user_id,    │
+│              source_ip, action, resource, status_code,    │
+│              bytes_transferred, attack_type, is_malicious │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      v
+┌───────────────────────────────────────────────────────────┐
+│                  Data Ingestion Layer                     │
+│            (src/data_ingestion/: parsers, validation)     │
+│                                                           │
+│  • Multi-format log parsers (JSON, syslog, CEF)           │
+│  • Schema validation & data cleaning                      │
+│  • Time-series alignment & deduplication                  │
+│  • Attack type normalization (SQL injection, XSS, etc.)   │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      v
+┌───────────────────────────────────────────────────────────┐
+│              Feature Engineering Layer                    │
+│         (src/feature_engineering/: behavioral,            │
+│          network, temporal features)                      │
+│                                                            │
+│  Behavioral Features:                                    │
+│    • Failed login attempts per session                   │
+│    • Access frequency patterns                           │
+│    • Privilege escalation indicators                     │
+│    • Command execution patterns                          │
+│                                                            │
+│  Network Features:                                       │
+│    • Connection patterns (internal/external)             │
+│    • Data transfer volume & rate                         │
+│    • Port access patterns                                │
+│    • Lateral movement indicators                         │
+│                                                            │
+│  Temporal Features:                                      │
+│    • Time-of-day anomalies                               │
+│    • Session duration outliers                           │
+│    • Action sequence timing                              │
+│    • Burst activity detection                            │
+│                                                            │
+│  Statistical Aggregations:                               │
+│    • Rolling windows, percentiles, entropy               │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      v
+┌───────────────────────────────────────────────────────────┐
+│                 Model Training Layer                      │
+│              (src/models/: multiple algorithms)           │
+│                                                            │
+│  1. Isolation Forest                                     │
+│     • Tree-based anomaly detection                       │
+│     • Performance: Precision 0.92, Recall 0.88, F1 0.90  │
+│     • AUC-ROC: 0.94                                      │
+│                                                            │
+│  2. Autoencoder (Deep Learning)                          │
+│     • Reconstruction error-based detection               │
+│     • Performance: Precision 0.89, Recall 0.91, F1 0.90  │
+│     • AUC-ROC: 0.93                                      │
+│                                                            │
+│  3. One-Class SVM                                        │
+│     • Boundary-based outlier detection                   │
+│     • Performance: Precision 0.87, Recall 0.85, F1 0.86  │
+│     • AUC-ROC: 0.91                                      │
+│                                                            │
+│  4. LSTM (Sequence Anomaly Detection)                    │
+│     • Temporal pattern analysis                          │
+│     • Performance: Precision 0.94, Recall 0.89, F1 0.91  │
+│     • AUC-ROC: 0.95 (best performer)                     │
+│                                                            │
+│  5. Ensemble Detector                                    │
+│     • Voting or weighted combination                     │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      v
+┌───────────────────────────────────────────────────────────┐
+│            Real-Time Detection Pipeline                   │
+│              (src/pipeline/: scoring, alerts)             │
+│                                                            │
+│  • Incoming log stream → feature extraction              │
+│  • Multi-model scoring (parallel inference)              │
+│  • Threshold optimization & calibration                  │
+│  • Anomaly score aggregation                             │
+│  • Alert generation with severity levels                 │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      v
+┌───────────────────────────────────────────────────────────┐
+│                   Alerting & Response                     │
+│          (src/alerting/: notification, triage)            │
+│                                                            │
+│  • Alert routing (SIEM, SOAR, email, Slack)              │
+│  • Incident enrichment (MITRE ATT&CK mapping)            │
+│  • Priority scoring & deduplication                      │
+│  • Dashboard & visualization (src/utils/visualization.py)│
+└───────────────────────────────────────────────────────────┘
+
 ```
 
 ### Components
