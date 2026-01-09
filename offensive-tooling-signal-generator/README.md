@@ -697,7 +697,7 @@ MIT License - See LICENSE file for details.
 ## 👤 Author
 
 **Mangesh Bhattacharya**
-- Email: mangeshb20@gmail.com
+- Email: mangesh.bhattacharya@ontariotechu.net
 - GitHub: [@Mangesh-Bhattacharya](https://github.com/Mangesh-Bhattacharya)
 
 ## 🙏 Acknowledgments
