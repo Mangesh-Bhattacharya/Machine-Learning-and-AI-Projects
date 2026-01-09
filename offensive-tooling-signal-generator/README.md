@@ -111,7 +111,8 @@ This framework:
 │  ┌──────────────────────────────────────────────────────────────┐          │
 │  │        Dataset Builder (dataset_builder.py)                  │          │
 │  │  • Labeled dataset generation (offensive + benign)           │          │
-│  │  • Training/test split • Feature normalization               │          │
+│  │  • Training/test split                                       |          |
+|  |  • Feature normalization                                     │          │
 │  └──────────────────────────────────────────────────────────────┘          │
 └────────────────────────────────────────────────────────────────────────────┘
                                    ↓
