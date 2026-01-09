@@ -16,9 +16,82 @@ This platform:
 ## 🏗️ Architecture
 
 ```
-Campaign Manager → Email Sender → User Interaction Tracker → ML Predictor → Dashboard/API
-                                          ↓
-                                  Feature Engineering → Model Training
+┌─────────────────────────────────────────────────────────────────┐
+│                    Campaign Management Layer                    │
+│  (src/campaigns/: templates, scheduling, target management)     │
+│                                                                 │
+│  • Template library (CEO fraud, credential harvest, malware)    │
+│  • Target list management & segmentation                        │
+│  • A/B testing & schedule automation                            │
+└─────────────────┬───────────────────────────────────────────────┘
+                  │
+                  v
+┌─────────────────────────────────────────────────────────────────┐
+│                    Email Delivery Layer                         │
+│           (src/email/: SMTP, tracking, redirection)             │
+│                                                                 │
+│  • SMTP integration with rate limiting                          │
+│  • Tracking pixel injection (email opens)                       │
+│  • Link redirection & click tracking                            │
+│  • Attachment monitoring                                        │
+└─────────────────┬───────────────────────────────────────────────┘
+                  │
+                  v
+┌─────────────────────────────────────────────────────────────────┐
+│              User Interaction Tracking Layer                    │
+│      (src/tracking/: opens, clicks, submissions, time-to-click) │
+│                                                                 │
+│  • Email open events (pixel triggers)                           │
+│  • Link click events (redirector logs)                          │
+│  • Form submission capture (credential input)                   │
+│  • Device/browser fingerprinting                                │
+│  • Temporal analytics (time-to-click, day/hour patterns)        │
+└─────────────────┬───────────────────────────────────────────────┘
+                  │
+                  v
+┌─────────────────────────────────────────────────────────────────┐
+│                  Feature Engineering Layer                      │
+│            (src/features/: user, email, temporal features)      │
+│                                                                 │
+│  • User demographics & role features                            │
+│  • Historical behavior (click rate, training completion)        │
+│  • Email characteristics (subject, sender, urgency indicators)  │
+│  • Temporal patterns (time of day, workload correlation)        │
+│  • Department/seniority-level aggregations                      │
+└─────────────────┬───────────────────────────────────────────────┘
+                  │
+                  v
+┌─────────────────────────────────────────────────────────────────┐
+│                    ML Prediction Layer                          │
+│              (src/ml/: risk scoring, click prediction)          │
+│                                                                 │
+│  • User Risk Scoring (RF/XGBoost/NN ensembles)                  │
+│  • Click Prediction (likelihood, time-to-click)                 │
+│  • Compromise Risk Analysis (submission probability)            │
+│  • Campaign Effectiveness Prediction (template scoring)         │
+│                                                                 │
+│  Models: Random Forest, XGBoost, Neural Network, Ensemble       │
+│  Performance: 87% accuracy, 0.91 AUC-ROC                        │
+└─────────────────┬───────────────────────────────────────────────┘
+                  │
+                  v
+┌─────────────────────────────────────────────────────────────────┐
+│                   Presentation & API Layer                      │
+│          (src/dashboard/, src/api/: visualization, REST)        │
+│                                                                 │
+│  Dashboard (React/TypeScript):                                  │
+│    • Real-time campaign monitoring                              │
+│    • User risk heatmaps (department, individual)                │
+│    • Interactive analytics & trend visualizations               │
+│    • Training recommendations                                   │
+│                                                                 │
+│  REST API (FastAPI/Flask):                                      │
+│    • /api/campaigns (CRUD)                                      │
+│    • /api/users/{email}/risk (risk scores)                      │
+│    • /api/analytics/* (aggregations, trends)                    │
+│    • /track/open/{token}, /track/click/{token}                  │
+└─────────────────────────────────────────────────────────────────┘
+
 ```
 
 ### Components
