@@ -1,0 +1,333 @@
+# Phishing Simulation Analytics Configuration
+
+# Email Configuration
+email:
+  smtp:
+    host: "smtp.company.com"
+    port: 587
+    username: "phishing@company.com"
+    password: "${SMTP_PASSWORD}"
+    use_tls: true
+    timeout: 30
+  
+  from_address: "noreply@company.com"
+  from_name: "IT Security Team"
+  
+  # Tracking domains
+  tracking_domain: "track.company.com"
+  landing_page_domain: "secure.company.com"
+  
+  # Rate limiting
+  send_rate_limit: 100  # emails per minute
+  batch_size: 50
+  retry_failed: true
+  max_retries: 3
+
+# Campaign Configuration
+campaigns:
+  # Template settings
+  templates_dir: "config/templates"
+  default_template: "office365_login"
+  
+  # Tracking settings
+  tracking:
+    pixel_enabled: true
+    link_tracking: true
+    form_tracking: true
+    device_fingerprinting: true
+    geolocation: true
+  
+  # Landing page settings
+  landing_pages:
+    show_education: true
+    education_delay: 5  # seconds
+    redirect_url: "https://company.com/security-training"
+    capture_credentials: false  # For testing only
+  
+  # Scheduling
+  scheduler:
+    enabled: true
+    timezone: "UTC"
+    business_hours_only: true
+    business_hours:
+      start: "09:00"
+      end: "17:00"
+    exclude_weekends: true
+
+# User Management
+users:
+  database: "postgresql://user:pass@localhost/phishing"
+  
+  # User attributes
+  attributes:
+    - "email"
+    - "first_name"
+    - "last_name"
+    - "department"
+    - "role"
+    - "seniority"
+    - "location"
+    - "manager"
+  
+  # Import settings
+  import:
+    csv_delimiter: ","
+    required_fields: ["email"]
+    validate_emails: true
+
+# Tracking Configuration
+tracking:
+  # Pixel tracking
+  pixel:
+    enabled: true
+    format: "png"
+    size: "1x1"
+  
+  # Link tracking
+  links:
+    enabled: true
+    use_shortener: true
+    track_redirects: true
+  
+  # Analytics
+  analytics:
+    session_timeout: 1800  # 30 minutes
+    track_user_agent: true
+    track_ip_address: true
+    track_referrer: true
+    geoip_database: "data/GeoLite2-City.mmdb"
+
+# Feature Engineering
+features:
+  # User features
+  user:
+    - "historical_click_rate"
+    - "training_completion_rate"
+    - "department_risk"
+    - "seniority_level"
+    - "previous_compromises"
+    - "time_since_training"
+    - "email_open_rate"
+    - "device_diversity"
+  
+  # Email features
+  email:
+    - "subject_length"
+    - "subject_urgency_score"
+    - "sender_spoofing_score"
+    - "link_count"
+    - "attachment_present"
+    - "personalization_level"
+  
+  # Temporal features
+  temporal:
+    - "send_time_hour"
+    - "send_time_day_of_week"
+    - "time_to_open"
+    - "time_to_click"
+  
+  # Aggregation
+  aggregation:
+    lookback_days: 90
+    min_campaigns: 3
+
+# Machine Learning Configuration
+ml:
+  # Model settings
+  models:
+    risk_predictor:
+      type: "random_forest"
+      n_estimators: 200
+      max_depth: 15
+      min_samples_split: 5
+      class_weight: "balanced"
+    
+    click_predictor:
+      type: "xgboost"
+      n_estimators: 150
+      max_depth: 10
+      learning_rate: 0.1
+    
+    time_predictor:
+      type: "neural_network"
+      hidden_layers: [128, 64, 32]
+      dropout: 0.3
+      epochs: 50
+  
+  # Training settings
+  training:
+    test_split: 0.2
+    validation_split: 0.1
+    cross_validation: 5
+    random_seed: 42
+    
+    # Class balancing
+    balance_classes: true
+    sampling_strategy: "auto"
+  
+  # Prediction settings
+  prediction:
+    risk_threshold: 0.7
+    confidence_threshold: 0.6
+    
+    # Risk levels
+    risk_levels:
+      low: [0, 30]
+      medium: [30, 60]
+      high: [60, 80]
+      critical: [80, 100]
+  
+  # Model paths
+  model_dir: "models/saved_models"
+  model_path: "models/saved_models/risk_predictor.pkl"
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: false
+  
+  # Authentication
+  auth:
+    enabled: true
+    jwt_secret: "${JWT_SECRET}"
+    jwt_algorithm: "HS256"
+    access_token_expire: 3600  # 1 hour
+  
+  # CORS
+  cors:
+    enabled: true
+    origins:
+      - "http://localhost:3000"
+      - "https://dashboard.company.com"
+    allow_credentials: true
+  
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+  
+  # Pagination
+  pagination:
+    default_page_size: 20
+    max_page_size: 100
+
+# Dashboard Configuration
+dashboard:
+  # Refresh intervals (seconds)
+  refresh:
+    overview: 30
+    campaigns: 60
+    analytics: 300
+  
+  # Chart settings
+  charts:
+    default_timeframe: "30d"
+    color_scheme: "blue"
+  
+  # Export settings
+  export:
+    formats: ["pdf", "csv", "xlsx"]
+    max_rows: 10000
+
+# Database Configuration
+database:
+  # PostgreSQL
+  postgres:
+    host: "localhost"
+    port: 5432
+    database: "phishing"
+    username: "phishing_user"
+    password: "${DB_PASSWORD}"
+    pool_size: 10
+    max_overflow: 20
+  
+  # Redis (for caching and queues)
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: "${REDIS_PASSWORD}"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "{time} | {level} | {message}"
+  rotation: "500 MB"
+  retention: "30 days"
+  
+  # Component-specific logging
+  components:
+    campaigns: "INFO"
+    email: "INFO"
+    tracking: "DEBUG"
+    ml: "INFO"
+    api: "INFO"
+
+# Security Configuration
+security:
+  # Token generation
+  tokens:
+    length: 32
+    algorithm: "sha256"
+  
+  # Data retention
+  retention:
+    campaign_data: 365  # days
+    tracking_data: 180
+    user_data: 730
+  
+  # Privacy
+  privacy:
+    anonymize_ip: false
+    gdpr_compliant: true
+    data_export_enabled: true
+
+# Notification Configuration
+notifications:
+  # Email notifications
+  email:
+    enabled: true
+    recipients:
+      - "security@company.com"
+    events:
+      - "campaign_complete"
+      - "high_risk_user"
+      - "system_error"
+  
+  # Slack notifications
+  slack:
+    enabled: false
+    webhook_url: "${SLACK_WEBHOOK_URL}"
+    channel: "#security-alerts"
+  
+  # Webhook notifications
+  webhook:
+    enabled: false
+    url: "${WEBHOOK_URL}"
+    events:
+      - "user_clicked"
+      - "user_submitted"
+
+# Reporting Configuration
+reporting:
+  # Scheduled reports
+  schedule:
+    enabled: true
+    frequency: "weekly"  # daily, weekly, monthly
+    day_of_week: "monday"
+    time: "09:00"
+  
+  # Report types
+  types:
+    - "executive_summary"
+    - "department_scorecard"
+    - "user_risk_report"
+    - "campaign_analysis"
+  
+  # Export settings
+  export:
+    format: "pdf"
+    include_charts: true
+    include_recommendations: true
