@@ -14,9 +14,42 @@ This system:
 ## 🏗️ Architecture
 
 ```
-Attack Logs → Feature Extraction → Multi-Label Classifier → MITRE ATT&CK Techniques
-                                          ↓
-                                    FastAPI Server → REST API
+        ┌──────────────────────────────────────────┐
+        │          Offline Training Pipeline       │
+        │                                          │
+        │  Attack Data Generator  →  Features  →   │
+Log/Sim │  (synthetic logs,       (TF-IDF,         │  Trained
+Schema  │   MITRE labels)          stats)          │  Models
+        │             ↓                            │
+        │       Multi-Label Models (RF/NN/Ensemble)│
+        └─────────────┬────────────────────────────┘
+                      │  save / load
+                      v
+              ┌────────────────────┐
+              │   Model Registry   │
+              │ models/saved_models│
+              └─────────┬──────────┘
+                        │
+                        v
+        ┌─────────────────────────────────────────┐
+        │            Online Serving Layer         │
+        │                                         │
+Clients→│ FastAPI Server (src/api/server.py)      │→ JSON response
+        │  - /predict, /predict/batch             │
+        │  - /techniques, /metrics, /health       │
+        │  - loads vectorizer + model pipeline    │
+        └─────────────────────────────────────────┘
+                        │
+                        v
+        ┌─────────────────────────────────────────┐
+        │        MITRE & Observability Layer      │
+        │                                         │
+        │ mitre_attack_mapping.json               │
+        │  - id, name, tactic, description        │
+        │ utils/metrics.py, visualization.py      │
+        │  - evaluation, reports, dashboards      │
+        └─────────────────────────────────────────┘
+
 ```
 
 ### Components
@@ -371,7 +404,7 @@ MIT License - See LICENSE file for details.
 ## 👤 Author
 
 **Mangesh Bhattacharya**
-- Email: mangeshb20@gmail.com
+- Email: mangesh.bhattacharya@ontariotechu.net
 - GitHub: [@Mangesh-Bhattacharya](https://github.com/Mangesh-Bhattacharya)
 
 ## 🙏 Acknowledgments
